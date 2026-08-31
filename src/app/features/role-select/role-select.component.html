@@ -1,0 +1,29 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+  <div class="w-full max-w-sm text-center">
+    <h1 class="text-3xl font-bold text-brand-600 mb-1">Minute Burger</h1>
+    <p class="text-sm text-gray-500 mb-8">Store Inventory System</p>
+
+    <div class="space-y-3">
+      <button
+        (click)="goTo('/login/crew')"
+        class="w-full bg-white hover:bg-brand-50 border-2 border-brand-600 text-brand-700 font-semibold py-3.5 rounded-xl shadow-sm transition"
+      >
+        Crew
+      </button>
+
+      <button
+        (click)="goTo('/login/head-crew')"
+        class="w-full bg-white hover:bg-brand-50 border-2 border-brand-600 text-brand-700 font-semibold py-3.5 rounded-xl shadow-sm transition"
+      >
+        Head Crew
+      </button>
+
+      <button
+        (click)="goTo('/login/management')"
+        class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3.5 rounded-xl shadow-sm transition"
+      >
+        Management
+      </button>
+    </div>
+  </div>
+</div>
