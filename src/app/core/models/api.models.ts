@@ -82,6 +82,46 @@ export interface BulkSubmitPayload {
 
 export type UserRole = 'crew' | 'head_crew' | 'admin' | 'manager';
 
+
+export interface CashCount {
+  id: number;
+  branch_id: number;
+  shift_number: number;
+  record_date: string;
+  pieces_1000: number;
+  pieces_500: number;
+  pieces_100: number;
+  pieces_50: number;
+  pieces_20: number;
+  pieces_10: number;
+  pieces_5: number;
+  pieces_1: number;
+  serials_1000: string[];
+  serials_500: string[];
+  total_cash: number;
+  total_expenses: number;
+  net_cash: number;
+  crew_name: string | null;
+  notes: string | null;
+}
+
+export interface CashCountPayload {
+  shift_number: 1 | 2 | 3;
+  record_date: string;
+  crew_name?: string;
+  pieces_1000: number;
+  pieces_500: number;
+  pieces_100: number;
+  pieces_50: number;
+  pieces_20: number;
+  pieces_10: number;
+  pieces_5: number;
+  pieces_1: number;
+  serials_1000: string[];
+  serials_500: string[];
+  total_expenses: number;
+  notes: string;
+}
 export interface CheckShiftResponse {
   branch_id: number;
   shift_number: number;

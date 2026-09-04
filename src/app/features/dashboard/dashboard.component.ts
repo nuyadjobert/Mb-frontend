@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit {
     public authService: AuthService,
     private inventoryService: InventoryService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadShift();
@@ -170,12 +170,17 @@ export class DashboardComponent implements OnInit {
     this.inventoryService.submitShift(payload).subscribe({
       next: (res) => {
         this.isSubmitting = false;
-        this.successMessage = `Shift ${res.shift_number} saved successfully. Total sales: ₱${res.shift_total_sales.toFixed(2)}`;
-        this.loadShift();
+        this.router.navigate(['/cash-count'], {
+          queryParams: {
+            shift_number: res.shift_number,
+            record_date: res.record_date,
+            crew_name: res.crew_name,
+          },
+        });
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage = err?.error?.message ?? err?.error?.errors?.items?.[0] ?? 'Failed to submit shift.';
+        this.errorMessage = err?.error?.message ?? 'Failed to submit shift.';
       },
     });
   }

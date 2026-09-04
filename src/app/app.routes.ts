@@ -6,6 +6,7 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { HeadCrewComponent } from './features/head-crew/head-crew.component';
 import { ManagementComponent } from './features/management/management.component';
 import { authGuard } from './core/guards/auth.guard';
+import { CashCountComponent } from './features/cash-count/cash-count.component';
 
 export const routes: Routes = [
   { path: '', component: RoleSelectComponent },
@@ -23,6 +24,7 @@ export const routes: Routes = [
   { path: 'login/management', component: ManagementLoginComponent },
 
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'cash-count', component: CashCountComponent, canActivate: [authGuard] },
   { path: 'head-crew', component: HeadCrewComponent, canActivate: [authGuard] },
   { path: 'management', component: ManagementComponent, canActivate: [authGuard] },
 
