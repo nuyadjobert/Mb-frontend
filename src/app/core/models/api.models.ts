@@ -103,6 +103,8 @@ export interface CashCount {
   net_cash: number;
   crew_name: string | null;
   notes: string | null;
+  finalized_at: string | null;
+  finalized_by: string | null;
 }
 
 export interface CashCountPayload {

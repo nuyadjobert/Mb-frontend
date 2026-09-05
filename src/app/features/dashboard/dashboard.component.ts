@@ -180,7 +180,10 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage = err?.error?.message ?? 'Failed to submit shift.';
+        const itemErrors = err?.error?.errors;
+        this.errorMessage = Array.isArray(itemErrors) && itemErrors.length
+          ? itemErrors.join(' | ')
+          : err?.error?.message ?? 'Failed to submit shift.';
       },
     });
   }

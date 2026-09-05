@@ -17,4 +17,12 @@ export class CashCountService {
   submitCashCount(payload: CashCountPayload): Observable<CashCount> {
     return this.http.post<CashCount>(`${environment.apiUrl}/cash-counts`, payload);
   }
+
+    finalize(shiftNumber: number, recordDate: string, finalizedBy: string): Observable<CashCount> {
+    return this.http.post<CashCount>(`${environment.apiUrl}/cash-counts/finalize`, {
+      shift_number: shiftNumber,
+      record_date: recordDate,
+      finalized_by: finalizedBy,
+    });
+  }
 }

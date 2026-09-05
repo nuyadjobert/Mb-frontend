@@ -104,8 +104,8 @@ export class CashCountComponent implements OnInit {
 
     while (arr.length < row.qty) arr.push('');
     while (arr.length > row.qty) arr.pop();
-    
   }
+
   trackByIndex(index: number): number {
     return index;
   }
@@ -145,7 +145,13 @@ export class CashCountComponent implements OnInit {
     this.cashCountService.submitCashCount(payload).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.successMessage = 'Cash count saved successfully.';
+        this.router.navigate(['/summary'], {
+          queryParams: {
+            shift_number: this.shiftNumber,
+            record_date: this.recordDate,
+            crew_name: this.crewName,
+          },
+        });
       },
       error: (err) => {
         this.isSubmitting = false;
