@@ -21,6 +21,8 @@ interface Row {
   usage_qty: number;
   total_order: number;
   total_sales: number;
+  is_divisible: boolean;
+  divisibility_error: string | null;
 }
 
 @Component({
@@ -79,6 +81,8 @@ export class DashboardComponent implements OnInit {
             usage_qty: 0,
             total_order: 0,
             total_sales: 0,
+            is_divisible: true,
+            divisibility_error: null,
           };
           this.recalculateRow(row);
           return row;
@@ -112,13 +116,38 @@ export class DashboardComponent implements OnInit {
 
   recalculateRow(row: Row): void {
     const ending = row.ending_qty ?? 0;
-    const usage = row.beginning_qty + row.del_qty - row.out_qty - ending;
+
+    const usage =
+      row.beginning_qty +
+      row.del_qty -
+      row.out_qty -
+      ending;
+
     const divisor = row.divisor > 0 ? row.divisor : 1;
+
     const totalOrder = usage / divisor;
 
     row.usage_qty = Math.round(usage * 100) / 100;
     row.total_order = Math.round(totalOrder * 100) / 100;
     row.total_sales = Math.round(totalOrder * row.price * 100) / 100;
+
+    // Reset validation
+    row.is_divisible = true;
+    row.divisibility_error = null;
+
+    // Don't flag an empty Ending field
+    if (row.ending_qty === null) {
+      return;
+    }
+
+    // Check if Usage is divisible by the item's divisor
+    const remainder = Math.abs(row.usage_qty % divisor);
+
+    if (remainder > 0.000001) {
+      row.is_divisible = false;
+      row.divisibility_error =
+        `Usage quantity (${row.usage_qty}) is not divisible by ${divisor}.`;
+    }
   }
 
   get grandTotalSales(): number {
@@ -135,8 +164,18 @@ export class DashboardComponent implements OnInit {
     }
 
     const incompleteRow = this.rows.find((r) => r.ending_qty === null);
+
     if (incompleteRow) {
-      this.errorMessage = `Please enter the Ending qty for "${incompleteRow.item_name}".`;
+      this.errorMessage =
+        `Please enter the Ending qty for "${incompleteRow.item_name}".`;
+      return;
+    }
+
+    const invalidRow = this.rows.find((r) => !r.is_divisible);
+
+    if (invalidRow) {
+      this.errorMessage =
+        `"${invalidRow.item_name}": ${invalidRow.divisibility_error}`;
       return;
     }
 
@@ -144,10 +183,6 @@ export class DashboardComponent implements OnInit {
     const missingReason = this.rows.find(
       (r) => this.isBeginningOverridden(r) && !r.beginning_override_reason.trim()
     );
-    if (missingReason) {
-      this.errorMessage = `Please enter a reason for correcting the Beginning qty of "${missingReason.item_name}".`;
-      return;
-    }
 
     const payload: BulkSubmitPayload = {
       shift_number: this.shiftNumber,

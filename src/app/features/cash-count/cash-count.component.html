@@ -45,8 +45,27 @@
                     <div *ngFor="let s of serials1000; let i = index; trackBy: trackByIndex"
                         class="flex items-center gap-2"> <span class="text-xs text-gray-400 w-16">Bill #{{ i + 1
                             }}</span>
-                        <input type="text" [(ngModel)]="serials1000[i]" placeholder="Serial number"
-                            class="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
+                        <input type="text" [(ngModel)]="serials1000[i]" (ngModelChange)="onSerialChange(1000, i)"
+                            placeholder="Serial number" [class.border-red-500]="
+    isEmptySerial(1000, i) ||
+    isDuplicateSerial(1000, i) ||
+    isCrossDenominationDuplicate(1000, i)
+  " [class.bg-red-50]="
+    isEmptySerial(1000, i) ||
+    isDuplicateSerial(1000, i) ||
+    isCrossDenominationDuplicate(1000, i)
+  " class="flex-1 border border-gray-300 rounded px-2 py-1 text-sm uppercase" />
+                        <div *ngIf="isDuplicateSerial(1000, i)" class="text-xs text-red-600">
+                            ⚠ Duplicate ₱1,000 serial number.
+                        </div>
+
+                        <div *ngIf="isCrossDenominationDuplicate(1000, i)" class="text-xs text-red-600">
+                            ⚠ This serial number is already being used for a ₱500 bill.
+                        </div>
+
+                        <div *ngIf="isEmptySerial(1000, i)" class="text-xs text-red-600">
+                            ⚠ Serial number is required.
+                        </div>
                     </div>
                 </div>
 
@@ -54,8 +73,27 @@
                     <div *ngFor="let s of serials500; let i = index; trackBy: trackByIndex"
                         class="flex items-center gap-2"> <span class="text-xs text-gray-400 w-16">Bill #{{ i + 1
                             }}</span>
-                        <input type="text" [(ngModel)]="serials500[i]" placeholder="Serial number"
-                            class="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" />
+                        <input type="text" [(ngModel)]="serials500[i]" (ngModelChange)="onSerialChange(500, i)"
+                            placeholder="Serial number" [class.border-red-500]="
+    isEmptySerial(500, i) ||
+    isDuplicateSerial(500, i) ||
+    isCrossDenominationDuplicate(500, i)
+  " [class.bg-red-50]="
+    isEmptySerial(500, i) ||
+    isDuplicateSerial(500, i) ||
+    isCrossDenominationDuplicate(500, i)
+  " class="flex-1 border border-gray-300 rounded px-2 py-1 text-sm uppercase" />
+                        <div *ngIf="isDuplicateSerial(500, i)" class="text-xs text-red-600">
+                            ⚠ Duplicate ₱500 serial number.
+                        </div>
+
+                        <div *ngIf="isCrossDenominationDuplicate(500, i)" class="text-xs text-red-600">
+                            ⚠ This serial number is already being used for a ₱1,000 bill.
+                        </div>
+
+                        <div *ngIf="isEmptySerial(500, i)" class="text-xs text-red-600">
+                            ⚠ Serial number is required.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,7 +129,7 @@
                 &larr; Back to Dashboard
             </button>
 
-            <button (click)="submit()" [disabled]="isSubmitting"
+            <button (click)="submit()" [disabled]="isSubmitting || hasSerialValidationError"
                 class="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg transition">
                 {{ isSubmitting ? 'Saving...' : 'Save Cash Count' }}
             </button>
