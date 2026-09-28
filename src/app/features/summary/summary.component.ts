@@ -37,7 +37,7 @@ export class SummaryComponent implements OnInit {
     private cashCountService: CashCountService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const qp = this.route.snapshot.queryParamMap;
@@ -210,10 +210,42 @@ export class SummaryComponent implements OnInit {
     this.isFinalizing = true;
 
     this.cashCountService.finalize(this.shiftNumber, this.recordDate, this.approverName).subscribe({
-      next: (cc) => {
+      next: () => {
         this.isFinalizing = false;
-        this.cashCount = cc;
-        this.successMessage = 'Shift approved and finalized.';
+
+        const nextShift =
+          this.shiftNumber < 3
+            ? ((this.shiftNumber + 1) as 1 | 2 | 3)
+            : null;
+
+        if (nextShift) {
+          this.successMessage =
+            `Shift ${this.shiftNumber} finalized. Starting Shift ${nextShift}...`;
+
+          setTimeout(() => {
+            this.router.navigate(['/dashboard'], {
+              queryParams: {
+                shift_number: nextShift,
+                record_date: this.recordDate,
+              },
+            });
+          }, 1200);
+
+          return;
+        }
+
+        // Shift 3 is the last shift of the day.
+        this.successMessage =
+          'Shift 3 finalized. The daily shifts are complete.';
+
+        setTimeout(() => {
+          this.router.navigate(['/dashboard'], {
+            queryParams: {
+              shift_number: 1,
+              record_date: this.recordDate,
+            },
+          });
+        }, 1200);
       },
       error: (err) => {
         this.isFinalizing = false;

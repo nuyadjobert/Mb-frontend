@@ -1,131 +1,861 @@
 <div class="min-h-screen bg-gray-100">
+
+  <!-- Header -->
   <header class="bg-white shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div
+      class="max-w-6xl mx-auto px-4 py-4
+             flex items-center justify-between"
+    >
       <div>
-        <h1 class="text-xl font-bold text-brand-600">Minute Burger</h1>
-        <p class="text-sm text-gray-500">{{ authService.currentBranch()?.name }}</p>
+        <h1 class="text-xl font-bold text-brand-600">
+          Minute Burger
+        </h1>
+
+        <p class="text-sm text-gray-500">
+          {{ authService.currentBranch()?.name }}
+        </p>
       </div>
-      <button (click)="logout()" class="text-sm text-gray-500 hover:text-red-600 font-medium">
+
+      <button
+        (click)="logout()"
+        class="text-sm text-gray-500
+               hover:text-red-600 font-medium"
+      >
         Logout
       </button>
     </div>
   </header>
 
+
   <main class="max-w-6xl mx-auto px-4 py-6">
-    <div class="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-wrap items-end gap-4">
+
+    <!-- Shift / Date -->
+    <div
+      class="bg-white rounded-xl shadow-sm p-4 mb-6
+             flex flex-wrap items-end gap-4"
+    >
+
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Shift</label>
-        <select [(ngModel)]="shiftNumber" (ngModelChange)="loadShift()"
-          class="border border-gray-300 rounded-lg px-3 py-2">
-          <option [ngValue]="1">1st Shift</option>
-          <option [ngValue]="2">2nd Shift</option>
-          <option [ngValue]="3">3rd Shift</option>
+        <label
+          class="block text-sm font-medium
+                 text-gray-700 mb-1"
+        >
+          Shift
+        </label>
+
+        <select
+          [(ngModel)]="shiftNumber"
+          (ngModelChange)="loadShift()"
+          class="border border-gray-300
+                 rounded-lg px-3 py-2"
+        >
+          <option [ngValue]="1">
+            1st Shift
+          </option>
+
+          <option [ngValue]="2">
+            2nd Shift
+          </option>
+
+          <option [ngValue]="3">
+            3rd Shift
+          </option>
         </select>
       </div>
 
+
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-        <input type="date" [(ngModel)]="recordDate" (change)="loadShift()"
-          class="border border-gray-300 rounded-lg px-3 py-2" />
+        <label
+          class="block text-sm font-medium
+                 text-gray-700 mb-1"
+        >
+          Date
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="recordDate"
+          (change)="loadShift()"
+          class="border border-gray-300
+                 rounded-lg px-3 py-2"
+        />
+      </div>
+
+    </div>
+
+
+    <!-- Success -->
+    <p
+      *ngIf="successMessage"
+      class="text-sm text-green-600 mb-4"
+    >
+      {{ successMessage }}
+    </p>
+
+
+    <!-- ================================================= -->
+    <!-- PREVIOUS SHIFT - READ ONLY -->
+    <!-- ================================================= -->
+
+    <div
+      *ngIf="previousShift"
+      class="mb-8"
+    >
+
+      <!-- Previous Shift Header -->
+      <div
+        class="flex items-center justify-between
+               mb-3"
+      >
+
+        <div>
+          <h2 class="font-bold text-gray-800">
+            Shift {{ previousShift }}
+          </h2>
+
+          <p class="text-xs text-gray-500">
+            Previous Shift
+          </p>
+        </div>
+
+        <span
+          class="text-xs font-semibold
+                 text-gray-500 bg-gray-200
+                 px-3 py-1 rounded-full"
+        >
+          🔒 Read Only
+        </span>
+
       </div>
 
 
+      <!-- Previous Shift Table -->
+      <div
+        class="bg-white rounded-xl shadow-sm
+               overflow-x-auto"
+      >
+
+        <table class="w-full text-sm">
+
+          <thead
+            class="bg-gray-50 text-gray-600
+                   uppercase text-xs"
+          >
+            <tr>
+
+              <th class="text-left px-4 py-3">
+                Item
+              </th>
+
+              <th class="text-right px-4 py-3">
+                Beginning
+              </th>
+
+              <th class="text-right px-4 py-3">
+                Del
+              </th>
+
+              <th class="text-right px-4 py-3">
+                Out
+              </th>
+
+              <th class="text-right px-4 py-3">
+                Ending
+              </th>
+
+              <th class="text-right px-4 py-3">
+                Usage
+              </th>
+
+              <th class="text-right px-4 py-3">
+                Total Order
+              </th>
+
+              <th class="text-right px-4 py-3">
+                Total Sales
+              </th>
+
+            </tr>
+          </thead>
+
+
+          <tbody class="divide-y divide-gray-100">
+
+            <tr
+              *ngFor="let row of previousShiftRows"
+              class="hover:bg-gray-50"
+            >
+
+              <!-- Item -->
+              <td
+                class="px-4 py-2
+                       font-medium text-gray-800"
+              >
+                {{ row.item_name }}
+
+                <span
+                  class="text-gray-400 text-xs"
+                >
+                  ({{ row.unit }})
+                </span>
+              </td>
+
+
+              <!-- Beginning -->
+              <td
+                class="px-4 py-2 text-right
+                       text-gray-600"
+              >
+                {{ row.beginning_qty }}
+
+                <div
+                  *ngIf="
+                    row.beginning_correction_confirmed &&
+                    row.beginning_override_reason
+                  "
+                  class="text-xs text-amber-600 mt-1"
+                >
+                  ✓ Corrected
+                </div>
+              </td>
+
+
+              <!-- Delivery -->
+              <td
+                class="px-4 py-2 text-right
+                       text-gray-600"
+              >
+                {{ row.del_qty }}
+              </td>
+
+
+              <!-- Out -->
+              <td
+                class="px-4 py-2 text-right
+                       text-gray-600"
+              >
+                {{ row.out_qty }}
+              </td>
+
+
+              <!-- Ending -->
+              <td
+                class="px-4 py-2 text-right
+                       font-semibold text-gray-800"
+              >
+                {{ row.ending_qty }}
+              </td>
+
+
+              <!-- Usage -->
+              <td
+                class="px-4 py-2 text-right
+                       text-gray-600"
+              >
+                {{ row.usage_qty }}
+              </td>
+
+
+              <!-- Total Order -->
+              <td
+                class="px-4 py-2 text-right
+                       text-gray-600"
+              >
+                {{ row.total_order }}
+              </td>
+
+
+              <!-- Total Sales -->
+              <td
+                class="px-4 py-2 text-right
+                       font-semibold text-brand-700"
+              >
+                ₱{{ row.total_sales.toFixed(2) }}
+              </td>
+
+            </tr>
+
+
+            <!-- No previous records -->
+            <tr
+              *ngIf="
+                !isLoading &&
+                previousShiftRows.length === 0
+              "
+            >
+              <td
+                colspan="8"
+                class="text-center py-8
+                       text-gray-400"
+              >
+                No completed record found for
+                Shift {{ previousShift }}.
+              </td>
+            </tr>
+
+          </tbody>
+
+
+          <!-- Previous Shift Total -->
+          <tfoot
+            *ngIf="previousShiftRows.length"
+            class="bg-gray-50 font-semibold"
+          >
+            <tr>
+
+              <td
+                colspan="7"
+                class="px-4 py-3 text-right"
+              >
+                Shift {{ previousShift }}
+                Total Sales
+              </td>
+
+              <td
+                class="px-4 py-3 text-right
+                       text-brand-700"
+              >
+                ₱{{ previousShiftTotalSales.toFixed(2) }}
+              </td>
+
+            </tr>
+          </tfoot>
+
+        </table>
+
+      </div>
+
     </div>
 
-    <p *ngIf="successMessage" class="text-sm text-green-600 mb-4">{{ successMessage }}</p>
 
-    <div class="bg-white rounded-xl shadow-sm overflow-x-auto">
+    <!-- ================================================= -->
+    <!-- CURRENT SHIFT - EDITABLE -->
+    <!-- ================================================= -->
+
+    <div
+      class="flex items-center justify-between
+             mb-3"
+    >
+
+      <div>
+        <h2 class="font-bold text-gray-800">
+          Shift {{ shiftNumber }}
+        </h2>
+
+        <p class="text-xs text-gray-500">
+          Current Shift
+        </p>
+      </div>
+
+      <span
+        class="text-xs font-semibold
+               text-brand-700 bg-brand-50
+               px-3 py-1 rounded-full"
+      >
+        ✏️ Editable
+      </span>
+
+    </div>
+
+
+    <!-- Current Shift Table -->
+    <div
+      class="bg-white rounded-xl shadow-sm
+             overflow-x-auto"
+    >
+
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+
+        <thead
+          class="bg-gray-50 text-gray-600
+                 uppercase text-xs"
+        >
           <tr>
-            <th class="text-left px-4 py-3">Item</th>
-            <th class="text-right px-4 py-3">Beginning</th>
-            <th class="text-right px-4 py-3">Del</th>
-            <th class="text-right px-4 py-3">Out</th>
-            <th class="text-right px-4 py-3">Ending</th>
-            <th class="text-right px-4 py-3">Usage</th>
-            <th class="text-right px-4 py-3">Total Order</th>
-            <th class="text-right px-4 py-3">Total Sales</th>
+
+            <th class="text-left px-4 py-3">
+              Item
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Beginning
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Del
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Out
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Ending
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Usage
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Total Order
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Total Sales
+            </th>
+
           </tr>
         </thead>
+
+
         <tbody class="divide-y divide-gray-100">
+
+          <!-- Loading -->
           <tr *ngIf="isLoading">
-            <td colspan="8" class="text-center py-8 text-gray-400">Loading items...</td>
+
+            <td
+              colspan="8"
+              class="text-center py-8
+                     text-gray-400"
+            >
+              Loading items...
+            </td>
+
           </tr>
 
-          <tr *ngFor="let row of rows" class="hover:bg-gray-50">
-            <td class="px-4 py-2 font-medium text-gray-800">
+
+          <!-- Current rows -->
+          <tr
+            *ngFor="let row of rows"
+            class="hover:bg-gray-50"
+          >
+
+            <!-- Item -->
+            <td
+              class="px-4 py-2
+                     font-medium text-gray-800"
+            >
               {{ row.item_name }}
-              <span class="text-gray-400 text-xs">({{ row.unit }})</span>
-            </td>
-            <td class="px-4 py-2 text-right">
-              <input type="number" min="0" [(ngModel)]="row.beginning_qty" (ngModelChange)="recalculateRow(row)"
-                [class.border-amber-400]="isBeginningOverridden(row)" [class.bg-amber-50]="isBeginningOverridden(row)"
-                class="w-24 text-right border border-gray-300 rounded px-2 py-1" />
 
-              <div *ngIf="isBeginningOverridden(row)" class="mt-1 text-left">
-                <span class="inline-block text-xs text-amber-700 bg-amber-100 rounded px-1.5 py-0.5 mb-1">
-                  Corrected (auto: {{ row.beginning_qty_auto }})
-                </span>
-                <input type="text" [(ngModel)]="row.beginning_override_reason" placeholder="Reason for correction"
-                  class="w-full text-xs border border-amber-300 rounded px-2 py-1" />
-                <button type="button" (click)="resetBeginning(row)"
-                  class="text-xs text-gray-400 hover:text-gray-600 underline mt-1">
-                  Reset to auto
-                </button>
+              <span
+                class="text-gray-400 text-xs"
+              >
+                ({{ row.unit }})
+              </span>
+            </td>
+
+
+            <!-- ================================================= -->
+            <!-- BEGINNING -->
+            <!-- ================================================= -->
+
+            <td class="px-4 py-2 text-right">
+
+              <!-- Beginning Quantity -->
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="row.beginning_qty"
+                (ngModelChange)="
+                  onBeginningChange(row)
+                "
+                [class.border-amber-400]="
+                  isBeginningOverridden(row)
+                "
+                [class.bg-amber-50]="
+                  isBeginningOverridden(row)
+                "
+                class="w-24 text-right
+                       border border-gray-300
+                       rounded px-2 py-1"
+              />
+
+
+              <!-- ================================================= -->
+              <!-- BEGINNING CORRECTION -->
+              <!-- ================================================= -->
+
+              <div
+                *ngIf="
+                  row.beginning_editing &&
+                  isBeginningOverridden(row)
+                "
+                class="mt-2 text-left
+                       bg-amber-50
+                       border border-amber-200
+                       rounded-lg p-2"
+              >
+
+                <!-- Auto value -->
+                <div
+                  class="text-xs text-amber-700
+                         font-medium mb-2"
+                >
+                  ⚠ Correcting auto value:
+
+                  <span class="font-bold">
+                    {{ row.beginning_qty_auto }}
+                  </span>
+                </div>
+
+
+                <!-- Reason -->
+                <label
+                  class="block text-xs
+                         font-medium text-gray-600
+                         mb-1"
+                >
+                  Reason for correction
+                </label>
+
+                <input
+                  type="text"
+                  [(ngModel)]="
+                    row.beginning_override_reason
+                  "
+                  placeholder="Enter reason for correction"
+                  class="w-full text-xs
+                         border border-amber-300
+                         rounded px-2 py-1.5
+                         focus:outline-none
+                         focus:ring-1
+                         focus:ring-amber-400"
+                />
+
+
+                <!-- Buttons -->
+                <div
+                  class="flex justify-end
+                         gap-2 mt-2"
+                >
+
+                  <!-- Cancel -->
+                  <button
+                    type="button"
+                    (click)="
+                      cancelBeginningCorrection(row)
+                    "
+                    class="text-xs
+                           px-3 py-1.5
+                           rounded-md
+                           border border-gray-300
+                           text-gray-600
+                           bg-white
+                           hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+
+
+                  <!-- Done -->
+                  <button
+                    type="button"
+                    (click)="
+                      confirmBeginningCorrection(row)
+                    "
+                    [disabled]="
+                      !row.beginning_override_reason.trim()
+                    "
+                    class="text-xs
+                           px-3 py-1.5
+                           rounded-md
+                           bg-brand-600
+                           hover:bg-brand-700
+                           disabled:opacity-50
+                           disabled:cursor-not-allowed
+                           text-white
+                           font-medium"
+                  >
+                    Done
+                  </button>
+
+                </div>
+
               </div>
-            </td>
-            <td class="px-4 py-2 text-right">
-              <input type="number" min="0" [(ngModel)]="row.del_qty" (ngModelChange)="recalculateRow(row)"
-                class="w-20 text-right border border-gray-300 rounded px-2 py-1" />
-            </td>
-            <td class="px-4 py-2 text-right">
-              <input type="number" min="0" [(ngModel)]="row.out_qty" (ngModelChange)="recalculateRow(row)"
-                class="w-20 text-right border border-gray-300 rounded px-2 py-1" />
-            </td>
-            <td class="px-4 py-2 text-right">
-              <input type="number" min="0" [(ngModel)]="row.ending_qty" (ngModelChange)="recalculateRow(row)"
-                placeholder="required" [class.border-red-500]="!row.is_divisible" [class.bg-red-50]="!row.is_divisible"
-                class="w-24 text-right border border-gray-300 rounded px-2 py-1" />
 
-              <div *ngIf="!row.is_divisible" class="mt-1 text-left text-xs text-red-600">
+
+              <!-- ================================================= -->
+              <!-- CONFIRMED CORRECTION -->
+              <!-- ================================================= -->
+
+              <div
+                *ngIf="
+                  !row.beginning_editing &&
+                  row.beginning_correction_confirmed &&
+                  isBeginningOverridden(row)
+                "
+                class="mt-1 text-left"
+              >
+
+                <span
+                  class="inline-block
+                         text-xs
+                         text-amber-700
+                         bg-amber-100
+                         rounded
+                         px-1.5 py-0.5"
+                >
+                  ✓ Corrected
+                  (auto: {{ row.beginning_qty_auto }})
+                </span>
+
+
+                <div
+                  class="text-xs
+                         text-gray-500
+                         mt-1"
+                >
+                  {{ row.beginning_override_reason }}
+                </div>
+
+
+                <button
+                  type="button"
+                  (click)="
+                    startBeginningCorrection(row)
+                  "
+                  class="text-xs
+                         text-gray-400
+                         hover:text-gray-600
+                         underline mt-1"
+                >
+                  Edit correction
+                </button>
+
+              </div>
+
+            </td>
+
+
+            <!-- Delivery -->
+            <td
+              class="px-4 py-2 text-right"
+            >
+
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="row.del_qty"
+                (ngModelChange)="
+                  recalculateRow(row)
+                "
+                class="w-20 text-right
+                       border border-gray-300
+                       rounded px-2 py-1"
+              />
+
+            </td>
+
+
+            <!-- Out -->
+            <td
+              class="px-4 py-2 text-right"
+            >
+
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="row.out_qty"
+                (ngModelChange)="
+                  recalculateRow(row)
+                "
+                class="w-20 text-right
+                       border border-gray-300
+                       rounded px-2 py-1"
+              />
+
+            </td>
+
+
+            <!-- Ending -->
+            <td
+              class="px-4 py-2 text-right"
+            >
+
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="row.ending_qty"
+                (ngModelChange)="
+                  recalculateRow(row)
+                "
+                placeholder="required"
+                [class.border-red-500]="
+                  row.ending_qty_error ||
+                  !row.is_divisible
+                "
+                [class.bg-red-50]="
+                  row.ending_qty_error ||
+                  !row.is_divisible
+                "
+                class="w-24 text-right
+                       border border-gray-300
+                       rounded px-2 py-1"
+              />
+
+
+              <!-- Ending Qty Error -->
+              <div
+                *ngIf="row.ending_qty_error"
+                class="mt-1 text-left
+                       text-xs text-red-600"
+              >
+                ⚠ {{ row.ending_qty_error }}
+              </div>
+
+
+              <!-- Divisibility Error -->
+              <div
+                *ngIf="
+                  !row.ending_qty_error &&
+                  !row.is_divisible
+                "
+                class="mt-1 text-left
+                       text-xs text-red-600"
+              >
                 ⚠ {{ row.divisibility_error }}
               </div>
+
             </td>
-            <td class="px-4 py-2 text-right" [class.text-red-600]="!row.is_divisible"
-              [class.font-semibold]="!row.is_divisible">
+
+
+            <!-- Usage -->
+            <td
+              class="px-4 py-2 text-right"
+              [class.text-red-600]="
+                !row.is_divisible
+              "
+              [class.font-semibold]="
+                !row.is_divisible
+              "
+            >
+
               {{ row.usage_qty }}
 
-              <div *ngIf="!row.is_divisible" class="text-xs text-red-600 font-normal">
+              <div
+                *ngIf="!row.is_divisible"
+                class="text-xs text-red-600
+                       font-normal"
+              >
                 Invalid
               </div>
+
             </td>
-            <td class="px-4 py-2 text-right text-gray-700">{{ row.total_order }}</td>
-            <td class="px-4 py-2 text-right font-semibold text-brand-700">
+
+
+            <!-- Total Order -->
+            <td
+              class="px-4 py-2 text-right
+                     text-gray-700"
+            >
+              {{ row.total_order }}
+            </td>
+
+
+            <!-- Total Sales -->
+            <td
+              class="px-4 py-2 text-right
+                     font-semibold text-brand-700"
+            >
               ₱{{ row.total_sales.toFixed(2) }}
             </td>
+
           </tr>
+
         </tbody>
-        <tfoot *ngIf="!isLoading && rows.length" class="bg-gray-50 font-semibold">
+
+
+        <!-- Current Shift Total -->
+        <tfoot
+          *ngIf="
+            !isLoading &&
+            rows.length
+          "
+          class="bg-gray-50 font-semibold"
+        >
           <tr>
-            <td colspan="7" class="px-4 py-3 text-right">Shift Total Sales</td>
-            <td class="px-4 py-3 text-right text-brand-700">₱{{ grandTotalSales.toFixed(2) }}</td>
+
+            <td
+              colspan="7"
+              class="px-4 py-3 text-right"
+            >
+              Shift Total Sales
+            </td>
+
+            <td
+              class="px-4 py-3 text-right
+                     text-brand-700"
+            >
+              ₱{{ grandTotalSales.toFixed(2) }}
+            </td>
+
           </tr>
         </tfoot>
-      </table>
-    </div>
-    <p *ngIf="errorMessage" class="text-sm text-red-600 mb-4">{{ errorMessage }}</p>
 
-    <div class="flex-1 min-w-[200px]">
-      <label class="block text-sm font-medium text-gray-700 mb-1">Crew Name</label>
-      <input type="text" [(ngModel)]="crewName" placeholder="Enter your name"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+      </table>
+
     </div>
-    <div class="mt-6 flex justify-end">
-      <button (click)="submitShift()" [disabled]="isSubmitting || isLoading"
-        class="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg transition">
-        {{ isSubmitting ? 'Submitting...' : 'Submit Shift' }}
+
+
+    <!-- Error -->
+    <p
+      *ngIf="errorMessage"
+      class="text-sm text-red-600 mt-4"
+    >
+      {{ errorMessage }}
+    </p>
+
+
+    <!-- Crew Name -->
+    <div
+      class="flex-1 min-w-[200px] mt-6"
+    >
+
+      <label
+        class="block text-sm font-medium
+               text-gray-700 mb-1"
+      >
+        Crew Name
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="crewName"
+        placeholder="Enter your name"
+        class="w-full border border-gray-300
+               rounded-lg px-3 py-2"
+      />
+
+    </div>
+
+
+    <!-- Submit -->
+    <div
+      class="mt-6 flex justify-end"
+    >
+
+      <button
+        (click)="submitShift()"
+        [disabled]="
+          isSubmitting ||
+          isLoading
+        "
+        class="bg-brand-600
+               hover:bg-brand-700
+               disabled:opacity-50
+               text-white font-semibold
+               px-6 py-2.5 rounded-lg
+               transition"
+      >
+        {{
+          isSubmitting
+            ? 'Submitting...'
+            : 'Submit Shift'
+        }}
       </button>
+
     </div>
+
   </main>
+
 </div>
