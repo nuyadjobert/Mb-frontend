@@ -1,55 +1,146 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-  <div class="w-full max-w-sm bg-white rounded-xl shadow-md p-8">
-    <button (click)="backToRoleSelect()" class="text-sm text-gray-400 hover:text-gray-600 mb-4">
-      &larr; Back
-    </button>
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
+  <div class="w-full max-w-3xl flex flex-col md:flex-row bg-white rounded-3xl shadow-xl ring-1 ring-black/5 overflow-hidden">
 
-    <div class="text-center mb-6">
-      <h1 class="text-2xl font-bold text-brand-600">Minute Burger</h1>
-      <p class="text-sm text-gray-500 mt-1">{{ pageTitle }}</p>
-    </div>
+    <!-- Left brand panel (same as role-select) -->
+    <aside class="hidden md:flex md:w-[40%] relative flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-700 to-brand-600 p-7 text-white">
+      <div class="pointer-events-none absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/10"></div>
+      <div class="pointer-events-none absolute -bottom-20 -left-12 h-56 w-56 rounded-full bg-black/10"></div>
 
-    <form (ngSubmit)="submit()" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Store Branch</label>
+      <div class="relative">
+        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 9l1.5-5h15L21 9" />
+            <path d="M4 9v11h16V9" />
+            <path d="M3 9a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0" />
+          </svg>
+        </div>
 
-        <select
-          *ngIf="!isLoadingBranches"
-          [(ngModel)]="selectedBranchId"
-          name="branchId"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        >
-          <option [ngValue]="null" disabled>Select your branch</option>
-          <option *ngFor="let branch of branches" [ngValue]="branch.id">
-            {{ branch.name }}
-          </option>
-        </select>
-
-        <p *ngIf="isLoadingBranches" class="text-sm text-gray-400">Loading branches...</p>
+        <p class="mt-6 text-xs font-semibold tracking-widest uppercase text-white/70">Minute Burger</p>
+        <h1 class="mt-2 text-2xl font-extrabold leading-tight tracking-tight">
+          Your store inventory, all in one place.
+        </h1>
+        <p class="mt-3 text-sm text-white/75">
+          Track stock and manage your branch without the paperwork.
+        </p>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          {{ loginAs === 'head_crew' ? 'Head Crew Code' : 'Store Code' }}
-        </label>
-        <input
-          type="password"
-          [(ngModel)]="storeCode"
-          name="storeCode"
-          placeholder="Enter code"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        />
-      </div>
+      <ul class="relative mt-8 space-y-3 text-sm font-medium">
+        <li class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm2 4h8v2H6V7zm0 4h5v2H6v-2z" /></svg>
+          </span>
+          Daily stock counts
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 2L2 6v2h16V6l-8-4zM4 10v6H2v2h16v-2h-2v-6h-2v6h-2v-6H10v6H8v-6H6v6H4v-6z" /></svg>
+          </span>
+          Branch inventory
+        </li>
+        <li class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" clip-rule="evenodd" /></svg>
+          </span>
+          Role-based access
+        </li>
+      </ul>
+    </aside>
 
-      <p *ngIf="errorMessage" class="text-sm text-red-600">{{ errorMessage }}</p>
-
+    <!-- Right form panel (styled like the role rows) -->
+    <section class="flex-1 flex flex-col justify-center px-6 py-8 sm:px-8 sm:py-9">
       <button
-        type="submit"
-        [disabled]="isSubmitting"
-        class="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition"
+        type="button"
+        (click)="backToRoleSelect()"
+        class="self-start inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 transition rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
       >
-        {{ isSubmitting ? 'Logging in...' : 'Login' }}
+        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M12.7 4.3a1 1 0 010 1.4L8.4 10l4.3 4.3a1 1 0 01-1.4 1.4l-5-5a1 1 0 010-1.4l5-5a1 1 0 011.4 0z" clip-rule="evenodd" />
+        </svg>
+        Back
       </button>
-    </form>
+
+      <!-- Mobile-only brand line -->
+      <p class="md:hidden mt-4 text-lg font-extrabold text-brand-600">Minute Burger</p>
+
+      <h2 class="mt-4 text-2xl font-bold tracking-tight text-gray-900">{{ pageTitle }}</h2>
+      <p class="mt-1 text-sm text-gray-500">Enter your branch and code to continue.</p>
+
+      <form (ngSubmit)="submit()" class="mt-6 space-y-4">
+        <div>
+          <label for="branchId" class="block text-sm font-medium text-gray-700 mb-1.5">Store branch</label>
+
+          <div *ngIf="!isLoadingBranches" class="relative">
+            <span class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-500 ring-1 ring-gray-200">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+              </svg>
+            </span>
+            <select
+              id="branchId"
+              [(ngModel)]="selectedBranchId"
+              name="branchId"
+              class="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl pl-14 pr-10 py-3.5 text-gray-900 transition hover:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            >
+              <option [ngValue]="null" disabled>Select your branch</option>
+              <option *ngFor="let branch of branches" [ngValue]="branch.id">
+                {{ branch.name }}
+              </option>
+            </select>
+            <svg class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+
+          <div *ngIf="isLoadingBranches" class="h-[54px] rounded-xl bg-gray-100 animate-pulse" aria-live="polite">
+            <span class="sr-only">Loading branches</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="storeCode" class="block text-sm font-medium text-gray-700 mb-1.5">
+            {{ loginAs === 'head_crew' ? 'Head crew code' : 'Store code' }}
+          </label>
+          <div class="relative">
+            <span class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-500 ring-1 ring-gray-200">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" clip-rule="evenodd" />
+              </svg>
+            </span>
+            <input
+              id="storeCode"
+              type="password"
+              autocomplete="current-password"
+              [(ngModel)]="storeCode"
+              name="storeCode"
+              placeholder="Enter code"
+              class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-14 pr-4 py-3.5 text-gray-900 placeholder-gray-400 transition hover:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        <p
+          *ngIf="errorMessage"
+          role="alert"
+          class="flex items-start gap-2 text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5"
+        >
+          <svg class="w-4 h-4 mt-0.5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-4a1 1 0 00-1 1v3a1 1 0 002 0V7a1 1 0 00-1-1zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+          </svg>
+          <span>{{ errorMessage }}</span>
+        </p>
+
+        <button
+          type="submit"
+          [disabled]="isSubmitting"
+          class="w-full inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500"
+        >
+          <svg *ngIf="isSubmitting" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
+            <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round" class="opacity-90" />
+          </svg>
+          {{ isSubmitting ? 'Logging in...' : 'Login' }}
+        </button>
+      </form>
+    </section>
   </div>
 </div>
