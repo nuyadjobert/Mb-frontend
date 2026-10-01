@@ -15,20 +15,80 @@ export const routes: Routes = [
   {
     path: 'login/crew',
     component: StoreLoginComponent,
-    data: { loginAs: 'crew', landingPath: '/dashboard', pageTitle: 'Crew Login' },
+    data: {
+      loginAs: 'crew',
+      landingPath: '/dashboard',
+      pageTitle: 'Crew Login',
+    },
   },
+
   {
     path: 'login/head-crew',
     component: StoreLoginComponent,
-    data: { loginAs: 'head_crew', landingPath: '/head-crew', pageTitle: 'Head Crew Login' },
+    data: {
+      loginAs: 'head_crew',
+      landingPath: '/head-crew',
+      pageTitle: 'Head Crew Login',
+    },
   },
-  { path: 'login/management', component: ManagementLoginComponent },
 
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'cash-count', component: CashCountComponent, canActivate: [authGuard] },
-  { path: 'summary', component: SummaryComponent, canActivate: [authGuard] },
-  { path: 'head-crew', component: HeadCrewComponent, canActivate: [authGuard] },
-  { path: 'management', component: ManagementComponent, canActivate: [authGuard] },
+  {
+    path: 'login/management',
+    component: ManagementLoginComponent,
+  },
+
+  { 
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [authGuard],
+  },
+
+  {
+    path: 'cash-count',
+    component: CashCountComponent,
+    canActivate: [authGuard],
+  },
+
+  {
+    path: 'summary',
+    component: SummaryComponent,
+    canActivate: [authGuard],
+  },
+
+  {
+    path: 'head-crew',
+    component: HeadCrewComponent,
+    canActivate: [authGuard],
+  },
+
+  // Head Crew Cash Count Review
+  {
+    path: 'head-crew/cash-count',
+    loadComponent: () =>
+      import(
+        './features/head-crew-cash-count/head-crew-cash-count.component'
+      ).then(
+        (m) => m.HeadCrewCashCountComponent
+      ),
+    canActivate: [authGuard],
+  },
+
+  {
+  path: 'head-crew/summary',
+  loadComponent: () =>
+    import(
+      './features/head-crew-summary/head-crew-summary.component'
+    ).then(
+      (m) => m.HeadCrewSummaryComponent
+    ),
+  canActivate: [authGuard],
+},
+
+  {
+    path: 'management',
+    component: ManagementComponent,
+    canActivate: [authGuard],
+  },
 
   { path: '**', redirectTo: '' },
 ];

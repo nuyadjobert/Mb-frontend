@@ -1,0 +1,811 @@
+<div class="min-h-screen bg-gray-100">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div
+      class="max-w-5xl mx-auto px-4 py-4
+             flex items-center justify-between"
+    >
+
+      <div>
+        <h1 class="text-xl font-bold text-brand-600">
+          Minute Burger
+        </h1>
+
+        <p class="text-sm text-gray-500">
+          Head Crew Cash Count Review
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="logout()"
+        class="px-4 py-2 rounded-lg
+               bg-gray-100 text-gray-700
+               hover:bg-gray-200 transition"
+      >
+        Logout
+      </button>
+
+    </div>
+  </header>
+
+
+  <!-- Main -->
+  <main class="max-w-5xl mx-auto px-4 py-8">
+
+    <!-- Page Header -->
+    <div class="mb-6">
+
+      <div
+        class="flex flex-col sm:flex-row
+               sm:items-center sm:justify-between gap-4"
+      >
+
+        <div>
+          <p class="text-sm text-gray-500">
+            Shift {{ shiftNumber }}
+            • {{ recordDate }}
+          </p>
+
+          <h2 class="text-2xl font-bold text-gray-800">
+            Cash Count Review
+          </h2>
+        </div>
+
+        <div
+          *ngIf="checkedBy"
+          class="text-sm text-gray-600"
+        >
+          Reviewed by:
+          <span class="font-semibold text-gray-800">
+            {{ checkedBy }}
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Loading -->
+    <div
+      *ngIf="isLoading"
+      class="bg-white rounded-xl shadow-sm
+             p-8 text-center"
+    >
+      <div class="text-gray-500">
+        Loading cash count...
+      </div>
+    </div>
+
+
+    <!-- Error -->
+    <div
+      *ngIf="errorMessage"
+      class="mb-5 p-4 rounded-lg
+             bg-red-50 border border-red-200
+             text-red-700"
+    >
+      {{ errorMessage }}
+    </div>
+
+
+    <!-- Success -->
+    <div
+      *ngIf="successMessage"
+      class="mb-5 p-4 rounded-lg
+             bg-green-50 border border-green-200
+             text-green-700"
+    >
+      {{ successMessage }}
+    </div>
+
+
+    <!-- No Cash Count -->
+    <div
+      *ngIf="!isLoading && !review"
+      class="bg-white rounded-xl shadow-sm
+             p-8 text-center"
+    >
+
+      <h3 class="text-lg font-semibold text-gray-800">
+        No Cash Count Found
+      </h3>
+
+      <p class="mt-2 text-gray-500">
+        The crew has not submitted a cash count
+        for this shift and date.
+      </p>
+
+      <button
+        type="button"
+        (click)="backToHeadCrew()"
+        class="mt-5 px-5 py-2.5 rounded-lg
+               bg-gray-800 text-white
+               hover:bg-gray-700 transition"
+      >
+        ← Back to Inventory Review
+      </button>
+
+    </div>
+
+
+    <!-- Cash Count Review -->
+    <div
+      *ngIf="!isLoading && review"
+      class="space-y-6"
+    >
+
+      <!-- Inventory Check Notice -->
+      <div
+        class="p-4 rounded-xl border"
+        [ngClass]="
+          allInventoryChecked
+            ? 'bg-green-50 border-green-200'
+            : 'bg-yellow-50 border-yellow-200'
+        "
+      >
+
+        <div
+          *ngIf="allInventoryChecked"
+          class="flex items-center gap-3"
+        >
+
+          <div
+            class="w-8 h-8 rounded-full
+                   bg-green-100 text-green-700
+                   flex items-center justify-center
+                   font-bold"
+          >
+            ✓
+          </div>
+
+          <div>
+            <p class="font-semibold text-green-800">
+              Inventory Review Complete
+            </p>
+
+            <p class="text-sm text-green-700">
+              All inventory items have been checked.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div
+          *ngIf="!allInventoryChecked"
+          class="flex items-center gap-3"
+        >
+
+          <div
+            class="w-8 h-8 rounded-full
+                   bg-yellow-100 text-yellow-700
+                   flex items-center justify-center
+                   font-bold"
+          >
+            !
+          </div>
+
+          <div>
+            <p class="font-semibold text-yellow-800">
+              Inventory Review Incomplete
+            </p>
+
+            <p class="text-sm text-yellow-700">
+              All inventory items must be checked
+              before confirming the Cash Count.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================== -->
+      <!-- SUBMITTED CASH COUNT -->
+      <!-- ===================================== -->
+
+      <section
+        class="bg-white rounded-xl shadow-sm
+               border border-gray-200 overflow-hidden"
+      >
+
+        <!-- Card Header -->
+        <div
+          class="px-5 py-4 border-b
+                 border-gray-200"
+        >
+
+          <h3 class="text-lg font-bold text-gray-800">
+            Submitted Cash Count
+          </h3>
+
+          <p class="text-sm text-gray-500 mt-1">
+            Cash count submitted by the crew.
+          </p>
+
+        </div>
+
+
+        <div class="p-5">
+
+          <!-- Denomination Table -->
+          <div class="overflow-x-auto">
+
+            <table class="w-full text-sm">
+
+              <thead>
+                <tr
+                  class="border-b border-gray-200
+                         text-gray-500"
+                >
+
+                  <th
+                    class="text-left py-3
+                           font-semibold"
+                  >
+                    Denomination
+                  </th>
+
+                  <th
+                    class="text-center py-3
+                           font-semibold"
+                  >
+                    Pieces
+                  </th>
+
+                  <th
+                    class="text-right py-3
+                           font-semibold"
+                  >
+                    Amount
+                  </th>
+
+                </tr>
+              </thead>
+
+
+              <tbody class="divide-y divide-gray-100">
+
+                <!-- ₱1000 -->
+                <tr>
+
+                  <td class="py-3 font-medium text-gray-800">
+                    ₱1,000
+                  </td>
+
+                  <td class="py-3 text-center text-gray-700">
+                    {{ review.cash_count.pieces_1000 }}
+                  </td>
+
+                  <td class="py-3 text-right font-medium text-gray-800">
+                    ₱{{
+                      Number(
+                        review.cash_count.pieces_1000 || 0
+                      ) * 1000
+                      | number:'1.2-2'
+                    }}
+                  </td>
+
+                </tr>
+
+
+                <!-- ₱500 -->
+                <tr>
+
+                  <td class="py-3 font-medium text-gray-800">
+                    ₱500
+                  </td>
+
+                  <td class="py-3 text-center text-gray-700">
+                    {{ review.cash_count.pieces_500 }}
+                  </td>
+
+                  <td class="py-3 text-right font-medium text-gray-800">
+                    ₱{{
+                      Number(
+                        review.cash_count.pieces_500 || 0
+                      ) * 500
+                      | number:'1.2-2'
+                    }}
+                  </td>
+
+                </tr>
+
+
+                <!-- ₱100 -->
+                <tr>
+
+                  <td class="py-3 font-medium text-gray-800">
+                    ₱100
+                  </td>
+
+                  <td class="py-3 text-center text-gray-700">
+                    {{ review.cash_count.pieces_100 }}
+                  </td>
+
+                  <td class="py-3 text-right font-medium text-gray-800">
+                    ₱{{
+                      Number(
+                        review.cash_count.pieces_100 || 0
+                      ) * 100
+                      | number:'1.2-2'
+                    }}
+                  </td>
+
+                </tr>
+
+
+                <!-- ₱50 -->
+                <tr>
+
+                  <td class="py-3 font-medium text-gray-800">
+                    ₱50
+                  </td>
+
+                  <td class="py-3 text-center text-gray-700">
+                    {{ review.cash_count.pieces_50 }}
+                  </td>
+
+                  <td class="py-3 text-right font-medium text-gray-800">
+                    ₱{{
+                      Number(
+                        review.cash_count.pieces_50 || 0
+                      ) * 50
+                      | number:'1.2-2'
+                    }}
+                  </td>
+
+                </tr>
+
+
+                <!-- ₱20 -->
+                <tr>
+
+                  <td class="py-3 font-medium text-gray-800">
+                    ₱20
+                  </td>
+
+                  <td class="py-3 text-center text-gray-700">
+                    {{ review.cash_count.pieces_20 }}
+                  </td>
+
+                  <td class="py-3 text-right font-medium text-gray-800">
+                    ₱{{
+                      Number(
+                        review.cash_count.pieces_20 || 0
+                      ) * 20
+                      | number:'1.2-2'
+                    }}
+                  </td>
+
+                </tr>
+
+
+                <!-- ₱10 -->
+                <tr>
+
+                  <td class="py-3 font-medium text-gray-800">
+                    ₱10
+                  </td>
+
+                  <td class="py-3 text-center text-gray-700">
+                    {{ review.cash_count.pieces_10 }}
+                  </td>
+
+                  <td class="py-3 text-right font-medium text-gray-800">
+                    ₱{{
+                      Number(
+                        review.cash_count.pieces_10 || 0
+                      ) * 10
+                      | number:'1.2-2'
+                    }}
+                  </td>
+
+                </tr>
+
+
+                <!-- ₱5 -->
+                <tr>
+
+                  <td class="py-3 font-medium text-gray-800">
+                    ₱5
+                  </td>
+
+                  <td class="py-3 text-center text-gray-700">
+                    {{ review.cash_count.pieces_5 }}
+                  </td>
+
+                  <td class="py-3 text-right font-medium text-gray-800">
+                    ₱{{
+                      Number(
+                        review.cash_count.pieces_5 || 0
+                      ) * 5
+                      | number:'1.2-2'
+                    }}
+                  </td>
+
+                </tr>
+
+
+                <!-- ₱1 -->
+                <tr>
+
+                  <td class="py-3 font-medium text-gray-800">
+                    ₱1
+                  </td>
+
+                  <td class="py-3 text-center text-gray-700">
+                    {{ review.cash_count.pieces_1 }}
+                  </td>
+
+                  <td class="py-3 text-right font-medium text-gray-800">
+                    ₱{{
+                      Number(
+                        review.cash_count.pieces_1 || 0
+                      ) * 1
+                      | number:'1.2-2'
+                    }}
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          <!-- Serial Numbers -->
+          <div
+            *ngIf="
+              review.cash_count.serials_1000.length ||
+              review.cash_count.serials_500.length
+            "
+            class="mt-6 grid
+                   grid-cols-1 md:grid-cols-2 gap-4"
+          >
+
+            <!-- ₱1000 Serials -->
+            <div
+              *ngIf="
+                review.cash_count.serials_1000.length
+              "
+              class="rounded-lg
+                     bg-gray-50
+                     border border-gray-200
+                     p-4"
+            >
+
+              <p
+                class="text-sm font-semibold
+                       text-gray-800 mb-3"
+              >
+                ₱1,000 Serial Numbers
+              </p>
+
+              <div class="space-y-2">
+
+                <div
+                  *ngFor="
+                    let serial of
+                    review.cash_count.serials_1000
+                  "
+                  class="px-3 py-2 rounded-md
+                         bg-white
+                         border border-gray-200
+                         text-sm text-gray-700"
+                >
+                  {{ serial }}
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- ₱500 Serials -->
+            <div
+              *ngIf="
+                review.cash_count.serials_500.length
+              "
+              class="rounded-lg
+                     bg-gray-50
+                     border border-gray-200
+                     p-4"
+            >
+
+              <p
+                class="text-sm font-semibold
+                       text-gray-800 mb-3"
+              >
+                ₱500 Serial Numbers
+              </p>
+
+              <div class="space-y-2">
+
+                <div
+                  *ngFor="
+                    let serial of
+                    review.cash_count.serials_500
+                  "
+                  class="px-3 py-2 rounded-md
+                         bg-white
+                         border border-gray-200
+                         text-sm text-gray-700"
+                >
+                  {{ serial }}
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Total Cash Count -->
+          <div
+            class="mt-6 rounded-xl
+                   bg-gray-50
+                   border border-gray-200
+                   p-5"
+          >
+
+            <div
+              class="flex items-center
+                     justify-between gap-4"
+            >
+
+              <div>
+
+                <p
+                  class="text-sm font-medium
+                         text-gray-500"
+                >
+                  Total Cash Count
+                </p>
+
+                <p
+                  class="mt-1 text-xs
+                         text-gray-500"
+                >
+                  Submitted by the crew
+                </p>
+
+              </div>
+
+              <p
+                class="text-3xl font-bold
+                       text-gray-900"
+              >
+                ₱{{ totalCashCount | number:'1.2-2' }}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================== -->
+      <!-- EXPENSES -->
+      <!-- ===================================== -->
+
+      <section
+        class="bg-white rounded-xl shadow-sm
+               border border-gray-200"
+      >
+
+        <div
+          class="px-5 py-4 border-b
+                 border-gray-200"
+        >
+
+          <h3 class="text-lg font-bold text-gray-800">
+            Expenses
+          </h3>
+
+          <p class="text-sm text-gray-500 mt-1">
+            Review or correct the total expenses
+            before confirming.
+          </p>
+
+        </div>
+
+
+        <div class="p-5">
+
+          <label
+            for="reviewedExpenses"
+            class="block text-sm font-semibold
+                   text-gray-700 mb-2"
+          >
+            Total Expenses
+          </label>
+
+          <div class="relative">
+
+            <span
+              class="absolute left-3 top-1/2
+                     -translate-y-1/2
+                     text-gray-500"
+            >
+              ₱
+            </span>
+
+            <input
+              id="reviewedExpenses"
+              type="number"
+              min="0"
+              step="0.01"
+              [(ngModel)]="reviewedExpenses"
+              [disabled]="
+                isSaving ||
+                isAlreadyReviewed
+              "
+              class="w-full pl-8 pr-4 py-3
+                     rounded-lg border
+                     border-gray-300
+                     focus:outline-none
+                     focus:ring-2
+                     focus:ring-brand-500
+                     disabled:bg-gray-100
+                     disabled:text-gray-500"
+            />
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================== -->
+      <!-- NOTES -->
+      <!-- ===================================== -->
+
+      <section
+        class="bg-white rounded-xl shadow-sm
+               border border-gray-200"
+      >
+
+        <div
+          class="px-5 py-4 border-b
+                 border-gray-200"
+        >
+
+          <h3 class="text-lg font-bold text-gray-800">
+            Notes
+          </h3>
+
+        </div>
+
+
+        <div class="p-5">
+
+          <textarea
+            id="reviewNotes"
+            rows="4"
+            [(ngModel)]="reviewNotes"
+            [disabled]="
+              isSaving ||
+              isAlreadyReviewed
+            "
+            placeholder="Add notes about this cash count..."
+            class="w-full px-4 py-3
+                   rounded-lg border
+                   border-gray-300
+                   resize-none
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-brand-500
+                   disabled:bg-gray-100
+                   disabled:text-gray-500"
+          ></textarea>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================== -->
+      <!-- ACTION BUTTONS -->
+      <!-- ===================================== -->
+
+      <div
+        class="flex flex-col-reverse
+               sm:flex-row sm:justify-between
+               gap-3"
+      >
+
+        <button
+          type="button"
+          (click)="backToHeadCrew()"
+          [disabled]="isSaving"
+          class="px-5 py-3 rounded-lg
+                 bg-gray-200 text-gray-700
+                 hover:bg-gray-300
+                 disabled:opacity-50
+                 transition"
+        >
+          ← Back to Inventory
+        </button>
+
+
+        <button
+          type="button"
+          (click)="saveReview()"
+          [disabled]="
+            isSaving ||
+            !allInventoryChecked ||
+            isAlreadyReviewed
+          "
+          class="px-6 py-3 rounded-lg
+                 bg-green-600 text-white
+                 font-semibold
+                 hover:bg-green-700
+                 disabled:opacity-50
+                 disabled:cursor-not-allowed
+                 transition"
+        >
+
+          <span *ngIf="!isSaving">
+            Confirm Cash Count →
+          </span>
+
+          <span *ngIf="isSaving">
+            Confirming...
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- Already Reviewed -->
+      <div
+        *ngIf="isAlreadyReviewed"
+        class="p-4 rounded-xl
+               bg-green-50
+               border border-green-200"
+      >
+
+        <p
+          class="font-semibold text-green-800"
+        >
+          Cash Count Already Confirmed
+        </p>
+
+        <p
+          class="mt-1 text-sm text-green-700"
+        >
+          This cash count has already been reviewed.
+        </p>
+
+        <div
+          *ngIf="review.cash_count.reviewed_by"
+          class="mt-2 text-sm text-green-700"
+        >
+
+          Reviewed by:
+          <span class="font-semibold">
+            {{ review.cash_count.reviewed_by }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>

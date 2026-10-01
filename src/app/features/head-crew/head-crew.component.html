@@ -1,124 +1,640 @@
 <div class="min-h-screen bg-gray-100">
+
+  <!-- HEADER -->
   <header class="bg-white shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-4 py-4
+             flex items-center justify-between">
       <div>
-        <h1 class="text-xl font-bold text-brand-600">Minute Burger</h1>
+        <h1 class="text-xl font-bold text-brand-600">
+          Minute Burger
+        </h1>
+
         <p class="text-sm text-gray-500">
-          {{ authService.currentBranch()?.name }} &middot; Head Crew Review
+          {{ authService.currentBranch()?.name }}
+          &middot;
+          Head Crew Review
         </p>
       </div>
-      <button (click)="logout()" class="text-sm text-gray-500 hover:text-red-600 font-medium">
+
+      <button (click)="logout()" class="text-sm text-gray-500
+               hover:text-red-600 font-medium">
         Logout
       </button>
     </div>
   </header>
 
+
+  <!-- MAIN -->
   <main class="max-w-6xl mx-auto px-4 py-6">
-    <div class="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-wrap items-end gap-4">
+
+    <!-- FILTER / HEAD CREW INFO -->
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-6
+             flex flex-wrap items-end gap-4">
+
+      <!-- SHIFT -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Shift</label>
-        <select
-          [(ngModel)]="shiftNumber"
-          (ngModelChange)="loadRecords()"
-          class="border border-gray-300 rounded-lg px-3 py-2"
-        >
-          <option [ngValue]="1">1st Shift</option>
-          <option [ngValue]="2">2nd Shift</option>
-          <option [ngValue]="3">3rd Shift</option>
+        <label class="block text-sm font-medium
+                 text-gray-700 mb-1">
+          Shift
+        </label>
+
+        <select [(ngModel)]="shiftNumber" (ngModelChange)="loadRecords()" class="border border-gray-300
+                 rounded-lg px-3 py-2">
+          <option [ngValue]="1">
+            1st Shift
+          </option>
+
+          <option [ngValue]="2">
+            2nd Shift
+          </option>
+
+          <option [ngValue]="3">
+            3rd Shift
+          </option>
         </select>
       </div>
 
+
+      <!-- DATE -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-        <input
-          type="date"
-          [(ngModel)]="recordDate"
-          (change)="loadRecords()"
-          class="border border-gray-300 rounded-lg px-3 py-2"
-        />
+        <label class="block text-sm font-medium
+                 text-gray-700 mb-1">
+          Date
+        </label>
+
+        <input type="date" [(ngModel)]="recordDate" (change)="loadRecords()" class="border border-gray-300
+                 rounded-lg px-3 py-2" />
       </div>
 
+
+      <!-- HEAD CREW NAME -->
       <div class="flex-1 min-w-[200px]">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Your Name (Head Crew)</label>
-        <input
-          type="text"
-          [(ngModel)]="checkedBy"
-          placeholder="Enter your name"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2"
-        />
+        <label class="block text-sm font-medium
+                 text-gray-700 mb-1">
+          Your Name (Head Crew)
+        </label>
+
+        <input type="text" [(ngModel)]="checkedBy" placeholder="Enter your name" class="w-full border border-gray-300
+                 rounded-lg px-3 py-2" />
       </div>
+
     </div>
 
-    <p *ngIf="errorMessage" class="text-sm text-red-600 mb-4">{{ errorMessage }}</p>
-    <p *ngIf="successMessage" class="text-sm text-green-600 mb-4">{{ successMessage }}</p>
 
-    <div class="bg-white rounded-xl shadow-sm overflow-x-auto">
+    <!-- STATUS MESSAGE -->
+    <p *ngIf="errorMessage" class="text-sm text-red-600 mb-4">
+      {{ errorMessage }}
+    </p>
+
+    <p *ngIf="successMessage" class="text-sm text-green-600 mb-4">
+      {{ successMessage }}
+    </p>
+
+
+    <!-- PROGRESS -->
+    <div *ngIf="!isLoading && records.length > 0" class="bg-white rounded-xl shadow-sm
+             p-4 mb-4 flex items-center
+             justify-between">
+
+      <div>
+        <p class="text-sm text-gray-500">
+          Inventory Review
+        </p>
+
+        <p class="font-semibold text-gray-800">
+          {{ records.length - allPendingCount }}
+          of
+          {{ records.length }}
+          items checked
+        </p>
+      </div>
+
+
+      <div *ngIf="!allRecordsChecked" class="text-sm font-medium
+               text-yellow-600">
+        {{ allPendingCount }}
+        item{{ allPendingCount === 1 ? '' : 's' }}
+        remaining
+      </div>
+
+
+      <div *ngIf="allRecordsChecked" class="text-sm font-semibold
+               text-green-600">
+        ✓ All items checked
+      </div>
+
+    </div>
+
+
+    <!-- INVENTORY TABLE -->
+    <div class="bg-white rounded-xl shadow-sm
+             overflow-x-auto">
+
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+
+        <thead class="bg-gray-50 text-gray-600
+                 uppercase text-xs">
           <tr>
-            <th class="text-left px-4 py-3">Item</th>
-            <th class="text-right px-4 py-3">Beginning</th>
-            <th class="text-right px-4 py-3">Del</th>
-            <th class="text-right px-4 py-3">Out</th>
-            <th class="text-right px-4 py-3">Ending</th>
-            <th class="text-right px-4 py-3">Usage</th>
-            <th class="text-right px-4 py-3">Total Sales</th>
-            <th class="text-left px-4 py-3">Crew</th>
-            <th class="text-left px-4 py-3">Status</th>
+
+            <th class="text-left px-4 py-3">
+              Item
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Beginning
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Del
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Out
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Ending
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Usage
+            </th>
+
+            <th class="text-right px-4 py-3">
+              Total Sales
+            </th>
+
+            <th class="text-left px-4 py-3">
+              Status
+            </th>
+
+            <th class="text-center px-4 py-3">
+              Action
+            </th>
+
           </tr>
         </thead>
+
+
         <tbody class="divide-y divide-gray-100">
+
+          <!-- LOADING -->
           <tr *ngIf="isLoading">
-            <td colspan="9" class="text-center py-8 text-gray-400">Loading submissions...</td>
+            <td colspan="9" class="text-center py-8
+                     text-gray-400">
+              Loading submissions...
+            </td>
           </tr>
-          <tr *ngIf="!isLoading && records.length === 0">
-            <td colspan="9" class="text-center py-8 text-gray-400">
+
+
+          <!-- EMPTY -->
+          <tr *ngIf="
+              !isLoading &&
+              records.length === 0
+            ">
+            <td colspan="9" class="text-center py-8
+                     text-gray-400">
               No submissions yet for this shift/date.
             </td>
           </tr>
 
-          <tr *ngFor="let r of records" class="hover:bg-gray-50">
-            <td class="px-4 py-2 font-medium text-gray-800">{{ r.item?.name }}</td>
-            <td class="px-4 py-2 text-right text-gray-500">{{ r.beginning_qty }}</td>
-            <td class="px-4 py-2 text-right text-gray-500">{{ r.del_qty }}</td>
-            <td class="px-4 py-2 text-right text-gray-500">{{ r.out_qty }}</td>
-            <td class="px-4 py-2 text-right text-gray-500">{{ r.ending_qty }}</td>
-            <td class="px-4 py-2 text-right text-gray-700">{{ r.usage_qty }}</td>
-            <td class="px-4 py-2 text-right font-semibold text-brand-700">
+
+          <!-- RECORDS -->
+          <tr *ngFor="let r of records" [id]="'record-' + r.id" class="hover:bg-gray-50
+                   transition">
+
+            <!-- ITEM -->
+            <td class="px-4 py-2
+                     font-medium text-gray-800">
+              {{ r.item?.name }}
+            </td>
+
+
+            <!-- BEGINNING -->
+            <td class="px-4 py-2
+                     text-right text-gray-500">
+              {{ r.beginning_qty }}
+            </td>
+
+
+            <!-- DELIVERY -->
+            <td class="px-4 py-2
+                     text-right text-gray-500">
+              {{ r.del_qty }}
+            </td>
+
+
+            <!-- OUT -->
+            <td class="px-4 py-2
+                     text-right text-gray-500">
+              {{ r.out_qty }}
+            </td>
+
+
+            <!-- ENDING -->
+            <td class="px-4 py-2
+                     text-right text-gray-500">
+              {{ r.ending_qty }}
+            </td>
+
+
+            <!-- USAGE -->
+            <td class="px-4 py-2
+                     text-right text-gray-700">
+              {{ r.usage_qty }}
+            </td>
+
+
+            <!-- SALES -->
+            <td class="px-4 py-2
+                     text-right font-semibold
+                     text-brand-700">
               ₱{{ Number(r.total_sales).toFixed(2) }}
             </td>
-            <td class="px-4 py-2 text-gray-600">{{ r.crew_name }}</td>
+
+
+            <!-- STATUS -->
             <td class="px-4 py-2">
-              <span
-                class="px-2 py-0.5 rounded-full text-xs font-medium"
-                [class.bg-yellow-100]="r.status === 'pending'"
-                [class.text-yellow-700]="r.status === 'pending'"
-                [class.bg-green-100]="r.status === 'checked'"
-                [class.text-green-700]="r.status === 'checked'"
-              >
+
+              <span class="px-2 py-0.5
+                       rounded-full text-xs
+                       font-medium" [class.bg-yellow-100]="
+                  r.status === 'pending'
+                " [class.text-yellow-700]="
+                  r.status === 'pending'
+                " [class.bg-green-100]="
+                  r.status === 'checked'
+                " [class.text-green-700]="
+                  r.status === 'checked'
+                ">
                 {{ r.status }}
               </span>
+
             </td>
+
+
+            <!-- ACTION -->
+            <td class="px-4 py-2 text-center">
+
+              <div class="flex items-center
+                       justify-center gap-2">
+
+                <!-- CONFIRM -->
+                <button *ngIf="r.status === 'pending'" type="button" (click)="confirmRecord(r)" [disabled]="
+    checkingRecordId === r.id
+  " class="inline-flex
+         items-center
+         justify-center
+         w-9 h-9 rounded-lg
+         bg-green-100
+         text-green-700
+         hover:bg-green-200
+         disabled:opacity-50
+         transition" title="Confirm item">
+                  <span *ngIf="checkingRecordId !== r.id">
+                    ✓
+                  </span>
+
+                  <span *ngIf="checkingRecordId === r.id">
+                    ...
+                  </span>
+                </button>
+
+
+                <!-- EDIT -->
+                <button (click)="editRecord(r)" class="inline-flex
+                         items-center
+                         justify-center
+                         w-9 h-9 rounded-lg
+                         bg-gray-100
+                         text-gray-700
+                         hover:bg-gray-200
+                         transition" title="Edit item">
+                  ✎
+                </button>
+
+              </div>
+
+            </td>
+
           </tr>
+
         </tbody>
-        <tfoot *ngIf="!isLoading && records.length" class="bg-gray-50 font-semibold">
+
+
+        <!-- TOTAL -->
+        <tfoot *ngIf="
+            !isLoading &&
+            records.length
+          " class="bg-gray-50 font-semibold">
           <tr>
-            <td colspan="6" class="px-4 py-3 text-right">Shift Total Sales</td>
-            <td class="px-4 py-3 text-right text-brand-700">₱{{ grandTotalSales.toFixed(2) }}</td>
+
+            <td colspan="6" class="px-4 py-3
+                     text-right">
+              Shift Total Sales
+            </td>
+
+            <td class="px-4 py-3
+                     text-right
+                     text-brand-700">
+              ₱{{ grandTotalSales.toFixed(2) }}
+            </td>
+
             <td colspan="2"></td>
+
           </tr>
         </tfoot>
+
       </table>
+
     </div>
 
-    <div class="mt-6 flex justify-end">
-      <button
-        (click)="checkAndSendToManagement()"
-        [disabled]="isChecking || isLoading"
-        class="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg transition"
-      >
-        {{ isChecking ? 'Checking...' : 'Check & Send to Management' }}
+
+    <!-- =====================================================
+         PROCEED TO CASH COUNT
+         ===================================================== -->
+
+    <div *ngIf="
+        !isLoading &&
+        records.length > 0 &&
+        allRecordsChecked
+      " class="mt-6 bg-white rounded-xl
+             shadow-sm p-5
+             flex flex-col sm:flex-row
+             items-center justify-between
+             gap-4">
+
+      <div>
+
+        <h2 class="font-semibold text-gray-800">
+          Inventory Review Complete
+        </h2>
+
+        <p class="text-sm text-gray-500 mt-1">
+          All inventory items have been
+          checked. You can now proceed
+          to the cash count.
+        </p>
+
+      </div>
+
+
+      <button type="button" (click)="proceedToCashCount()" class="w-full sm:w-auto
+               px-6 py-3
+               rounded-lg
+               bg-brand-600
+               hover:bg-brand-700
+               text-white
+               font-semibold
+               transition">
+        Proceed to Cash Count
+        <span class="ml-1">
+          →
+        </span>
       </button>
+
     </div>
+
   </main>
+
+
+  <!-- =======================================================
+       EDIT MODAL
+       ======================================================= -->
+
+  <div *ngIf="
+      showEditModal &&
+      selectedRecord
+    " class="fixed inset-0 z-50
+           flex items-center justify-center
+           bg-black/40 px-4">
+
+    <div class="bg-white rounded-xl shadow-xl
+             w-full max-w-lg
+             max-h-[90vh]
+             overflow-y-auto">
+
+      <!-- MODAL HEADER -->
+      <div class="px-6 py-4
+               border-b border-gray-100
+               flex items-center
+               justify-between">
+
+        <div>
+
+          <h2 class="text-lg font-bold
+                   text-gray-800">
+            Edit Inventory
+          </h2>
+
+          <p class="text-sm text-gray-500 mt-1">
+            {{ selectedRecord.item?.name }}
+          </p>
+
+        </div>
+
+
+        <button type="button" (click)="closeEditModal()" [disabled]="isSavingEdit" class="text-gray-400
+                 hover:text-gray-600
+                 text-xl">
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- MODAL BODY -->
+      <div class="p-6">
+
+        <!-- BEGINNING -->
+        <div class="mb-4">
+
+          <label class="block text-sm
+                   font-medium
+                   text-gray-700 mb-1">
+            Beginning Quantity
+          </label>
+
+          <input type="number" min="0" [(ngModel)]="
+              editForm.beginning_qty
+            " class="w-full
+                   border border-gray-300
+                   rounded-lg px-3 py-2
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-brand-500" />
+
+        </div>
+
+
+        <!-- DELIVERY -->
+        <div class="mb-4">
+
+          <label class="block text-sm
+                   font-medium
+                   text-gray-700 mb-1">
+            Delivery
+          </label>
+
+          <input type="number" min="0" [(ngModel)]="
+              editForm.del_qty
+            " class="w-full
+                   border border-gray-300
+                   rounded-lg px-3 py-2
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-brand-500" />
+
+        </div>
+
+
+        <!-- OUT -->
+        <div class="mb-4">
+
+          <label class="block text-sm
+                   font-medium
+                   text-gray-700 mb-1">
+            Out
+          </label>
+
+          <input type="number" min="0" [(ngModel)]="
+              editForm.out_qty
+            " class="w-full
+                   border border-gray-300
+                   rounded-lg px-3 py-2
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-brand-500" />
+
+        </div>
+
+
+        <!-- ENDING -->
+        <div class="mb-4">
+
+          <label class="block text-sm
+                   font-medium
+                   text-gray-700 mb-1">
+            Ending Quantity
+          </label>
+
+          <input type="number" min="0" [(ngModel)]="
+              editForm.ending_qty
+            " class="w-full
+                   border border-gray-300
+                   rounded-lg px-3 py-2
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-brand-500" />
+
+        </div>
+
+
+        <!-- REASON -->
+        <div class="mb-4">
+
+          <label class="block text-sm
+                   font-medium
+                   text-gray-700 mb-1">
+            Reason for Editing
+
+            <span class="text-red-500">
+              *
+            </span>
+          </label>
+
+          <textarea [(ngModel)]="editReason" rows="3"
+            placeholder="Explain why this inventory record needs to be edited..." class="w-full
+                   border border-gray-300
+                   rounded-lg px-3 py-2
+                   resize-none
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-brand-500"></textarea>
+
+          <p class="text-xs text-gray-400 mt-1">
+            A reason is required before the
+            changes can be saved.
+          </p>
+
+        </div>
+
+
+        <!-- CALCULATIONS -->
+        <div class="bg-gray-50
+                 rounded-lg p-4 mb-5">
+
+          <div class="flex justify-between
+                   text-sm mb-2">
+
+            <span class="text-gray-500">
+              Calculated Usage
+            </span>
+
+            <span class="font-semibold
+                     text-gray-800">
+              {{ editUsage }}
+            </span>
+
+          </div>
+
+
+          <div class="flex justify-between
+                   text-sm">
+
+            <span class="text-gray-500">
+              Calculated Total Sales
+            </span>
+
+            <span class="font-semibold
+                     text-brand-700">
+              ₱{{ editTotalSales.toFixed(2) }}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- MODAL FOOTER -->
+      <div class="px-6 py-4
+               border-t border-gray-100
+               flex justify-end gap-3">
+
+        <button type="button" (click)="closeEditModal()" [disabled]="isSavingEdit" class="px-4 py-2
+                 rounded-lg
+                 border border-gray-300
+                 text-gray-700
+                 hover:bg-gray-50
+                 disabled:opacity-50">
+          Cancel
+        </button>
+
+
+        <button type="button" (click)="saveEdit()" [disabled]="
+            isSavingEdit ||
+            !editReason.trim()
+          " class="px-5 py-2
+                 rounded-lg
+                 bg-brand-600
+                 hover:bg-brand-700
+                 text-white
+                 font-semibold
+                 disabled:opacity-50
+                 transition">
+          {{
+          isSavingEdit
+          ? 'Saving...'
+          : 'Save & Confirm'
+          }}
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>

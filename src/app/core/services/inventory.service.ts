@@ -13,40 +13,104 @@ import {
 export class InventoryService {
   constructor(private http: HttpClient) {}
 
-  getShiftPreview(shiftNumber: number, recordDate: string): Observable<ShiftPreviewResponse> {
+  getShiftPreview(
+    shiftNumber: number,
+    recordDate: string
+  ): Observable<ShiftPreviewResponse> {
     return this.http.get<ShiftPreviewResponse>(
       `${environment.apiUrl}/inventory-records/shift-preview`,
-      { params: { shift_number: shiftNumber, record_date: recordDate } }
+      {
+        params: {
+          shift_number: shiftNumber,
+          record_date: recordDate,
+        },
+      }
     );
   }
 
-  submitShift(payload: BulkSubmitPayload): Observable<BulkSubmitResponse> {
+  submitShift(
+    payload: BulkSubmitPayload
+  ): Observable<BulkSubmitResponse> {
     return this.http.post<BulkSubmitResponse>(
       `${environment.apiUrl}/inventory-records/bulk`,
       payload
     );
   }
 
-  /** Head Crew: list a shift's submitted records (optionally filtered by status). */
-  getRecords(shiftNumber: number, recordDate: string, status?: 'pending' | 'checked') {
+  getRecords(
+    shiftNumber: number,
+    recordDate: string,
+    status?: 'pending' | 'checked'
+  ) {
     const params: Record<string, string | number> = {
       shift_number: shiftNumber,
       record_date: recordDate,
     };
-    if (status) params['status'] = status;
 
-    return this.http.get<{ data: any[] }>(`${environment.apiUrl}/inventory-records`, { params });
+    if (status) {
+      params['status'] = status;
+    }
+
+    return this.http.get<{ data: any[]; total?: number }>(
+      `${environment.apiUrl}/inventory-records`,
+      { params }
+    );
   }
 
+  /**
+   * Head Crew:
+   * Confirm one inventory record without editing it.
+   */
+  checkRecord(
+    recordId: number,
+    checkedBy: string
+  ): Observable<any> {
+    return this.http.post<any>(
+      `${environment.apiUrl}/inventory-records/${recordId}/check`,
+      {
+        checked_by: checkedBy,
+      }
+    );
+  }
+
+  /**
+   * Head Crew:
+   * Edit one inventory record, require a reason,
+   * recalculate its values, then mark it as checked.
+   */
+  editAndCheckRecord(
+    recordId: number,
+    payload: {
+      beginning_qty: number;
+      del_qty: number;
+      out_qty: number;
+      ending_qty: number;
+      reason: string;
+      checked_by: string;
+    }
+  ): Observable<any> {
+    return this.http.put<any>(
+      `${environment.apiUrl}/inventory-records/${recordId}/head-crew-edit`,
+      payload
+    );
+  }
+
+  /**
+   * Existing shift-level checking method.
+   * Kept for compatibility.
+   */
   checkShift(
     shiftNumber: number,
     recordDate: string,
     checkedBy: string
   ): Observable<CheckShiftResponse> {
-    return this.http.post<CheckShiftResponse>(`${environment.apiUrl}/inventory-records/check-shift`, {
-      shift_number: shiftNumber,
-      record_date: recordDate,
-      checked_by: checkedBy,
-    });
+    return this.http.post<CheckShiftResponse>(
+      `${environment.apiUrl}/inventory-records/check-shift`,
+      {
+        shift_number: shiftNumber,
+        record_date: recordDate,
+        checked_by: checkedBy,
+      }
+    );
   }
 }
