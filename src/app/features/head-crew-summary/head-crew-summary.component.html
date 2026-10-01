@@ -1,359 +1,200 @@
-<div class="min-h-screen bg-gray-100">
+<div class="min-h-screen bg-gray-50 pb-6">
 
   <!-- Header -->
-  <header class="bg-white shadow-sm">
-    <div
-      class="max-w-4xl mx-auto px-4 py-4
-             flex items-center justify-between"
-    >
-      <div>
-        <h1 class="text-xl font-bold text-brand-600">
-          Minute Burger
-        </h1>
-
-        <p class="text-sm text-gray-500">
-          {{ authService.currentBranch()?.name }}
-          &middot;
-          Head Crew Summary
-          &middot;
-          Shift {{ shiftNumber }}
-          &middot;
-          {{ recordDate }}
+  <header class="bg-white border-b border-gray-200">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <h1 class="text-xl font-bold text-brand-600 leading-tight">Minute Burger</h1>
+        <p class="text-sm text-gray-500 truncate">
+          {{ authService.currentBranch()?.name }} · Head Crew Summary · Shift {{ shiftNumber }} · {{ recordDate }}
         </p>
       </div>
 
-      <button
-        type="button"
-        (click)="logout()"
-        class="text-sm text-gray-500
-               hover:text-red-600 font-medium"
-      >
+      <button type="button" (click)="logout()"
+        class="text-sm font-medium text-gray-600 hover:text-gray-900 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded">
         Logout
       </button>
     </div>
   </header>
 
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
-  <!-- Main -->
-  <main class="max-w-4xl mx-auto px-4 py-6">
-
-    <!-- Page Heading -->
-    <div class="mb-6">
-      <h2 class="text-2xl font-bold text-gray-800">
-        Shift Reconciliation
-      </h2>
-
-      <p class="text-sm text-gray-500 mt-1">
-        Final review of inventory sales and submitted cash count.
-      </p>
+    <!-- Page heading -->
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">Shift Reconciliation</h2>
+      <p class="text-sm text-gray-500 mt-1">Final review of inventory sales and submitted cash count.</p>
     </div>
-
 
     <!-- Loading -->
-    <div
-      *ngIf="isLoading"
-      class="bg-white rounded-xl shadow-sm p-6 text-center"
-    >
-      <p class="text-sm text-gray-500">
-        Loading summary...
-      </p>
+    <div *ngIf="isLoading"
+      class="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-6 text-center text-sm text-gray-500">
+      Loading summary...
     </div>
-
 
     <!-- Error -->
-    <div
-      *ngIf="errorMessage"
-      class="bg-red-50 border border-red-200
-             text-red-700 rounded-lg px-4 py-3 mb-6"
-    >
-      {{ errorMessage }}
-    </div>
-
+    <p *ngIf="errorMessage" role="alert"
+      class="flex items-start gap-2 text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+      <svg class="w-4 h-4 mt-0.5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-4a1 1 0 00-1 1v3a1 1 0 002 0V7a1 1 0 00-1-1zm0 8a1 1 0 100-2 1 1 0 000 2z"
+          clip-rule="evenodd" />
+      </svg>
+      <span>{{ errorMessage }}</span>
+    </p>
 
     <!-- Summary -->
-    <div *ngIf="review && !isLoading">
+    <ng-container *ngIf="review && !isLoading">
 
-      <!-- Inventory Status -->
+      <!-- Inventory status -->
       <div
-        class="bg-white rounded-xl shadow-sm p-4 mb-6
-               border border-gray-100"
-      >
-        <div class="flex items-center justify-between gap-4">
-
-          <div>
-            <h3 class="font-semibold text-gray-800">
-              Inventory Review
-            </h3>
-
-            <p class="text-sm text-gray-500 mt-1">
-              {{ review.checked_inventory_count }}
-              of
-              {{ review.inventory_count }}
-              inventory records checked
-            </p>
-          </div>
-
-          <div
-            *ngIf="review.inventory_checked"
-            class="px-3 py-1.5 rounded-full
-                   bg-green-100 text-green-700
-                   text-xs font-semibold"
-          >
-            ✓ CHECKED
-          </div>
-
-          <div
-            *ngIf="!review.inventory_checked"
-            class="px-3 py-1.5 rounded-full
-                   bg-yellow-100 text-yellow-700
-                   text-xs font-semibold"
-          >
-            PENDING
-          </div>
-
-        </div>
-      </div>
-
-
-      <!-- Financial Summary -->
-      <div
-        class="bg-white rounded-xl shadow-sm
-               overflow-hidden mb-6"
-      >
-
-        <div
-          class="px-4 py-4
-                 border-b border-gray-100"
-        >
-          <h3 class="font-semibold text-gray-800">
-            Financial Summary
-          </h3>
-
-          <p class="text-xs text-gray-500 mt-1">
-            Shift {{ shiftNumber }} · {{ recordDate }}
+        class="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-4 sm:p-5 flex items-center justify-between gap-4">
+        <div>
+          <h3 class="font-semibold text-gray-900">Inventory Review</h3>
+          <p class="text-sm text-gray-500 mt-1">
+            {{ review.checked_inventory_count }} of {{ review.inventory_count }} inventory records checked
           </p>
         </div>
 
+        <div *ngIf="review.inventory_checked"
+          class="text-xs font-semibold text-green-700 bg-green-100 px-3 py-1 rounded-full">
+          ✓ CHECKED
+        </div>
 
-        <div class="p-4">
-
-          <!-- Total Sales -->
-          <div
-            class="flex items-center justify-between
-                   py-3 border-b border-gray-100"
-          >
-            <span class="text-sm text-gray-500">
-              Total Sales
-            </span>
-
-            <span class="text-base font-semibold text-gray-800">
-              ₱{{ totalSales | number:'1.2-2' }}
-            </span>
-          </div>
-
-
-          <!-- Total Expenses -->
-          <div
-            class="flex items-center justify-between
-                   py-3 border-b border-gray-100"
-          >
-            <span class="text-sm text-gray-500">
-              Total Expenses
-            </span>
-
-            <span class="text-base font-semibold text-gray-800">
-              ₱{{ totalExpenses | number:'1.2-2' }}
-            </span>
-          </div>
-
-
-          <!-- Expected Cash -->
-          <div
-            class="flex items-center justify-between
-                   py-3 border-b border-gray-100"
-          >
-            <div>
-              <span class="text-sm text-gray-500">
-                Expected Cash
-              </span>
-
-              <p class="text-xs text-gray-400 mt-0.5">
-                Total Sales − Total Expenses
-              </p>
-            </div>
-
-            <span class="text-base font-semibold text-gray-800">
-              ₱{{ expectedCash | number:'1.2-2' }}
-            </span>
-          </div>
-
-
-          <!-- Actual Cash -->
-          <div
-            class="flex items-center justify-between
-                   py-3 border-b border-gray-100"
-          >
-            <span class="text-sm text-gray-500">
-              Total Cash Count
-            </span>
-
-            <span class="text-base font-semibold text-gray-800">
-              ₱{{ totalCashCount | number:'1.2-2' }}
-            </span>
-          </div>
-
-
-          <!-- Variance -->
-          <div
-            class="flex items-center justify-between
-                   py-4 mt-1"
-          >
-            <div>
-              <span class="text-sm font-semibold text-gray-700">
-                Variance
-              </span>
-
-              <p class="text-xs text-gray-400 mt-0.5">
-                Actual Cash − Expected Cash
-              </p>
-            </div>
-
-            <span
-              class="text-xl font-bold"
-              [ngClass]="{
-                'text-red-600': varianceStatus === 'SHORT',
-                'text-green-600': varianceStatus === 'EXACT',
-                'text-orange-600': varianceStatus === 'OVER'
-              }"
-            >
-              ₱{{ variance | number:'1.2-2' }}
-            </span>
-          </div>
-
+        <div *ngIf="!review.inventory_checked"
+          class="text-xs font-semibold text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
+          PENDING
         </div>
       </div>
 
+      <!-- Financial summary -->
+      <section class="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 overflow-hidden">
 
-      <!-- Reconciliation Result -->
-      <div
-        class="rounded-xl p-6 mb-6 text-center border"
-        [ngClass]="{
+        <div class="px-4 py-4 sm:px-5 border-b border-gray-100">
+          <h3 class="font-semibold text-gray-900">Financial Summary</h3>
+          <p class="text-xs text-gray-500 mt-0.5">Shift {{ shiftNumber }} · {{ recordDate }}</p>
+        </div>
+
+        <div class="px-4 sm:px-5 divide-y divide-gray-100">
+
+          <div class="flex items-center justify-between py-3">
+            <span class="text-sm text-gray-500">Total Sales</span>
+            <span class="text-base font-semibold text-gray-900">₱{{ totalSales | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="flex items-center justify-between py-3">
+            <span class="text-sm text-gray-500">Total Expenses</span>
+            <span class="text-base font-semibold text-gray-900">₱{{ totalExpenses | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="flex items-center justify-between py-3">
+            <div>
+              <span class="text-sm text-gray-500">Expected Cash</span>
+              <p class="text-xs text-gray-400 mt-0.5">Total Sales − Total Expenses</p>
+            </div>
+            <span class="text-base font-semibold text-gray-900">₱{{ expectedCash | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="flex items-center justify-between py-3">
+            <span class="text-sm text-gray-500">Total Cash Count</span>
+            <span class="text-base font-semibold text-gray-900">₱{{ totalCashCount | number:'1.2-2' }}</span>
+          </div>
+
+        </div>
+
+        <div class="px-4 sm:px-5 py-4 bg-gray-50 flex items-center justify-between">
+          <div>
+            <span class="text-sm font-semibold text-gray-700">Variance</span>
+            <p class="text-xs text-gray-400 mt-0.5">Actual Cash − Expected Cash</p>
+          </div>
+
+          <span class="text-xl font-bold" [ngClass]="{
+              'text-red-600': varianceStatus === 'SHORT',
+              'text-green-600': varianceStatus === 'EXACT',
+              'text-orange-600': varianceStatus === 'OVER'
+            }">
+            ₱{{ variance | number:'1.2-2' }}
+          </span>
+        </div>
+
+      </section>
+
+      <!-- Reconciliation result -->
+      <div class="rounded-2xl p-6 text-center border" [ngClass]="{
           'bg-red-50 border-red-200': varianceStatus === 'SHORT',
           'bg-green-50 border-green-200': varianceStatus === 'EXACT',
           'bg-orange-50 border-orange-200': varianceStatus === 'OVER'
-        }"
-      >
+        }">
 
-        <div
-          class="text-3xl font-bold"
-          [ngClass]="{
+        <div class="text-3xl font-bold" [ngClass]="{
             'text-red-700': varianceStatus === 'SHORT',
             'text-green-700': varianceStatus === 'EXACT',
             'text-orange-700': varianceStatus === 'OVER'
-          }"
-        >
+          }">
           {{ varianceStatusLabel }}
         </div>
 
-        <p
-          class="text-sm mt-2"
-          [ngClass]="{
+        <p class="text-sm mt-2" [ngClass]="{
             'text-red-600': varianceStatus === 'SHORT',
             'text-green-600': varianceStatus === 'EXACT',
             'text-orange-600': varianceStatus === 'OVER'
-          }"
-        >
+          }">
           {{ varianceDescription }}
         </p>
 
       </div>
 
+      <!-- Review information -->
+      <section class="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-4 sm:p-5">
 
-      <!-- Review Information -->
-      <div
-        class="bg-white rounded-xl shadow-sm p-4 mb-6"
-      >
-
-        <h3 class="font-semibold text-gray-800 mb-3">
-          Review Information
-        </h3>
+        <h3 class="font-semibold text-gray-900 mb-3">Review Information</h3>
 
         <div class="space-y-2 text-sm">
 
           <div class="flex justify-between gap-4">
-            <span class="text-gray-500">
-              Reviewed By
-            </span>
-
-            <span class="font-medium text-gray-800">
-              {{ reviewedBy }}
-            </span>
+            <span class="text-gray-500">Reviewed By</span>
+            <span class="font-medium text-gray-900">{{ reviewedBy }}</span>
           </div>
 
-          <div
-            *ngIf="reviewNotes"
-            class="pt-2 border-t border-gray-100"
-          >
-            <span class="text-gray-500">
-              Review Notes
-            </span>
-
-            <p class="text-gray-700 mt-1">
-              {{ reviewNotes }}
-            </p>
+          <div *ngIf="reviewNotes" class="pt-2 border-t border-gray-100">
+            <span class="text-gray-500">Review Notes</span>
+            <p class="text-gray-700 mt-1">{{ reviewNotes }}</p>
           </div>
 
         </div>
-      </div>
 
+      </section>
 
-      <!-- Confirmation Notice -->
-      <div
-        class="bg-green-50 border border-green-200
-               text-green-800 rounded-lg
-               px-4 py-3 mb-6"
-      >
-        <div class="font-semibold">
-          ✓ Cash Count Confirmed
+      <!-- Confirmation notice -->
+      <div role="status"
+        class="flex items-start gap-2 text-sm text-green-800 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+        <svg class="w-4 h-4 mt-0.5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z"
+            clip-rule="evenodd" />
+        </svg>
+        <div>
+          <p class="font-semibold">Cash Count Confirmed</p>
+          <p class="mt-0.5">The inventory and cash count for this shift have been reviewed successfully.</p>
         </div>
-
-        <p class="text-sm mt-1">
-          The inventory and cash count for this shift
-          have been reviewed successfully.
-        </p>
       </div>
-
 
       <!-- Navigation -->
       <div
-        class="flex flex-wrap justify-between
-               items-center gap-3"
-      >
+        class="bg-white rounded-2xl shadow-lg ring-1 ring-black/10 p-4 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
 
-        <button
-          type="button"
-          (click)="backToCashCount()"
-          class="text-gray-500 hover:text-gray-700
-                 font-medium px-4 py-2.5"
-        >
+        <button type="button" (click)="backToCashCount()"
+          class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
           &larr; Back to Cash Count
         </button>
 
-
-        <button
-          type="button"
-          (click)="continueToNextShift()"
-          class="bg-brand-600 hover:bg-brand-700
-                 text-white font-semibold
-                 px-6 py-2.5 rounded-lg
-                 transition"
-        >
+        <button type="button" (click)="continueToNextShift()"
+          class="inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-semibold px-6 py-2.5 rounded-xl shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-500">
           Continue to Next Shift &rarr;
         </button>
 
       </div>
 
-    </div>
+    </ng-container>
 
   </main>
 </div>
